@@ -1,15 +1,15 @@
 const global = {
   currentPage: window.location.pathname,
   search: {
-    term:'',
-    type:'',
-    page:1,
-    totalPages: 1
+    term: '',
+    type: '',
+    page: 1,
+    totalPages: 1,
   },
-  api:{
+  api: {
     apiKey: '5c6bdcd939359fd514270f993c5e79b9',
-    apiUrl: 'https://api.themoviedb.org/3/'
-  }
+    apiUrl: 'https://api.themoviedb.org/3/',
+  },
 };
 
 // Display 20 most popular MOVIES
@@ -206,25 +206,22 @@ function displaybackgroundImage(type, backgroundPath) {
   }
 }
 
-// Search Movies/Shows
-async function search(){
-  const queryString = window.location.search;
-  const urlParams = new URLSearchParams(queryString);
+// // Search Movies/Shows
+// async function search() {
+//   const queryString = window.location.search;
+//   const urlParams = new URLSearchParams(queryString);
 
-  global.search.type = urlParams.get('type');
-  global.search.term = urlParams.get('search-term');
+//   global.search.type = urlParams.get('type');
+//   global.search.term = urlParams.get('search-term');
 
-  if(global.search.term !== '' && global.search.term !== null){
-    // @todo - make request and display results
-    const results = await searchAPIData();
-    console.log(results);
-  }else{
-    showAlert('Please enter a search term');
-  }
-
-
-}
-
+//   if (global.search.term !== '' && global.search.term !== null) {
+//     // @todo - make request and display results
+//     const results = await searchAPIData();
+//     console.log(results);
+//   } else {
+//     showAlert('Please enter a search term');
+//   }
+// }
 
 // Display Slider Movies
 async function displaySlider() {
@@ -274,13 +271,14 @@ function initSwipper() {
 }
 
 // Make Request to Search
-async function searchAPIData() {
-  const API_KEY = global.api.apiKey; //shouldn't be here in production;
-  const API_URL = global.api.apiUrl;
+// Fetch data from TMDB API
+async function fetchAPIData(endpoint) {
+  const API_KEY = '5c6bdcd939359fd514270f993c5e79b9'; //shouldn't be here in production;
+  const API_URL = 'https://api.themoviedb.org/3/';
 
   showSpinner();
   const response = await fetch(
-    `${API_URL}search/${global.search.type}?api_key=${API_KEY}&language=en-US&query=${global.search.term}`
+    `${API_URL}${endpoint}?api_key=${API_KEY}&language=en-US`
   ); //should be on SERVER if it is in production
 
   const data = await response.json();
@@ -306,18 +304,17 @@ function hightlightActiveLink() {
   });
 }
 
-// Show Alert
-function showAlert(message,className){
-  const alertEl = document.createElement('div');
-  alertEl.classList.add('alert',className);
-  alertEl.appendChild(document.createTextNode(message))
-  document.querySelector('#alert').appendChild(alertEl);
+// // Show Alert
+// function showAlert(message, className) {
+//   const alertEl = document.createElement('div');
+//   alertEl.classList.add('alert', className);
+//   alertEl.appendChild(document.createTextNode(message));
+//   document.querySelector('#alert').appendChild(alertEl);
 
-
-  setTimeout(()=>{alertEl.remove()},3000);
-
-}
-
+//   setTimeout(() => {
+//     alertEl.remove();
+//   }, 3000);
+// }
 
 function addCommasToNumber(number) {
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -343,7 +340,7 @@ function init() {
       displayShowDetails();
       break;
     case '/search.html':
-      search();
+      console.log('Search');
       break;
   }
 

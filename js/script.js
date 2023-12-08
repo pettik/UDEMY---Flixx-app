@@ -15,7 +15,7 @@ const global = {
 // Display 20 most popular MOVIES
 async function displayPopularMovies() {
   const { results } = await fetchAPIData('movie/popular'); // {results} <= {resutls:{...},{...},{...}}
-  results.forEach(movie => {
+  results.forEach((movie) => {
     const div = document.createElement('div');
     div.classList.add('card');
     div.innerHTML = `
@@ -41,7 +41,7 @@ async function displayPopularMovies() {
 // Display 20 most popular TV shows
 async function displayPopularShows() {
   const { results } = await fetchAPIData('tv/popular'); // {results} <= {resutls:{...},{...},{...}}
-  results.forEach(show => {
+  results.forEach((show) => {
     const div = document.createElement('div');
     div.classList.add('card');
     div.innerHTML = `
@@ -69,7 +69,7 @@ async function displayMovieDetails() {
   const movieId = window.location.search.split('=')[1];
 
   const movie = await fetchAPIData(`movie/${movieId}`);
-
+  console.log(movie);
   // Overlay for background image
   displaybackgroundImage('movie', movie.backdrop_path);
 
@@ -95,7 +95,7 @@ async function displayMovieDetails() {
     </p>
     <h5>Genres</h5>
     <ul class="list-group">
-      ${movie.genres.map(genre => `<li>${genre.name}</li>`).join('')}
+      ${movie.genres.map((genre) => `<li>${genre.name}</li>`).join('')}
     </ul>
     <a href="${
       movie.homepage
@@ -118,7 +118,7 @@ async function displayMovieDetails() {
   </ul>
   <h4>Production Companies</h4>
   <div class="list-group">${movie.production_companies
-    .map(company => `<span>${company.name}</span>`)
+    .map((company) => `<span>${company.name}</span>`)
     .join(', ')}</div>
 </div>
   `;
@@ -130,7 +130,6 @@ async function displayShowDetails() {
   const showId = window.location.search.split('=')[1];
 
   const show = await fetchAPIData(`tv/${showId}`);
-
   // Overlay for background image
   displaybackgroundImage('tv', show.backdrop_path);
 
@@ -156,7 +155,7 @@ async function displayShowDetails() {
     </p>
     <h5>Genres</h5>
     <ul class="list-group">
-      ${show.genres.map(genre => `<li>${genre.name}</li>`).join('')}
+      ${show.genres.map((genre) => `<li>${genre.name}</li>`).join('')}
     </ul>
     <a href="${
       show.homepage
@@ -176,7 +175,7 @@ async function displayShowDetails() {
   </ul>
   <h4>Production Companies</h4>
   <div class="list-group">${show.production_companies
-    .map(company => `<span>${company.name}</span>`)
+    .map((company) => `<span>${company.name}</span>`)
     .join(', ')}</div>
 </div>
   `;
@@ -217,17 +216,60 @@ async function search() {
 
   if (global.search.term !== '' && global.search.term !== null) {
     // @todo - make request and display results
-    const results = await searchAPIData();
-    console.log(results);
+    const { results, total_pages, page } = await searchAPIData();
+
+    if (results.length === 0) {
+      showAlert('No results found');
+      return;
+    }
+
+    displaySearchResults(results);
+    document.querySelector('#search-term').value = '';
   } else {
     showAlert('Please enter a search term');
   }
 }
 
+function displaySearchResults(results) {
+  results.forEach((result) => {
+    const div = document.createElement('div');
+    div.classList.add('card');
+    div.innerHTML = `
+    <a href="${global.search.type}-details.html?id=${result.id}">
+      ${
+        result.poster_path
+          ? `<img src="http://image.tmdb.org/t/p/w500/${
+              result.poster_path
+            }" class="card-img-top" alt="${
+              global.search.type === 'movie' ? result.title : result.name
+            }" />`
+          : `<img src="images/no-image.jpg" class="card-img-top" alt="${
+              global.search.type === 'movie' ? result.title : result.name
+            }" />`
+      }
+    </a>
+    <div class="card-body">
+      <h5 class="card-title">${
+        global.search.type === 'movie' ? result.title : result.name
+      }</h5>
+      <p class="card-text">
+        <small class="text-muted">Release: ${
+          global.search.type === 'movie'
+            ? result.release_date
+            : result.first_air_date
+        }</small>
+      </p>
+    </div>
+    `;
+
+    document.querySelector('#search-results').appendChild(div);
+  });
+}
+
 // Display Slider Movies
 async function displaySlider() {
   const { results } = await fetchAPIData('movie/now_playing');
-  results.forEach(movie => {
+  results.forEach((movie) => {
     const div = document.createElement('div');
     div.classList.add('swiper-slide');
 
@@ -312,7 +354,7 @@ function hideSpinner() {
 function hightlightActiveLink() {
   const links = document.querySelectorAll('.nav-link');
 
-  links.forEach(link => {
+  links.forEach((link) => {
     if (link.getAttribute('href') === global.currentPage) {
       link.classList.add('active');
     }
@@ -320,7 +362,7 @@ function hightlightActiveLink() {
 }
 
 // Show Alert
-function showAlert(message, className) {
+function showAlert(message, className = 'error') {
   const alertEl = document.createElement('div');
   alertEl.classList.add('alert', className);
   alertEl.appendChild(document.createTextNode(message));
